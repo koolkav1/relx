@@ -26,7 +26,7 @@ export class HomeComponent implements OnInit {
       CompaniesSelectors.selectcompanies
     );
   }
-  ngOnInit() {
+  ngOnInit(): void {
     this.searchCompanyControl.valueChanges.pipe(
       startWith(''),
       debounceTime(400),
@@ -39,5 +39,8 @@ export class HomeComponent implements OnInit {
         }
       })
     );
+  }
+  handleSelection(item: Item): void {
+    // Dispatch action to handle selection/ direct to companies detail page
   }
 }

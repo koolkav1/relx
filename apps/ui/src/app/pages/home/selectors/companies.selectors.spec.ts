@@ -1,10 +1,11 @@
-import * as fromCompanies from '../../reducers/companies/companies.reducer';
-import { selectCompaniesState } from './companies.selectors';
+import * as fromCompanies from '../reducers/companies.index.reducer';
+import { loadCompaniesFromState } from './companies.selectors';
+
 
 describe('Companies Selectors', () => {
   it('should select the feature state', () => {
-    const result = selectCompaniesState({
-      [fromCompanies.companiesFeatureKey]: {}
+    const result = loadCompaniesFromState({
+      [fromCompanies.companiesStateFeatureKey]: {}
     });
 
     expect(result).toEqual({});
