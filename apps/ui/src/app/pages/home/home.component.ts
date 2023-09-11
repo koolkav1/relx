@@ -1,27 +1,43 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Observable, startWith, map } from 'rxjs';
+import { Store } from '@ngrx/store';
+import {
+  Observable,
+  startWith,
+  map,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+} from 'rxjs';
+import { CompaniesSelectors } from './selectors/companies.selectors';
+import { Item } from '../../models/company-search.interface';
+import { CompaniesActions } from './actions/companies.actions';
 
 @Component({
   selector: 'relx-app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  myControl = new FormControl('');
-  options: string[] = ['One', 'Two', 'Three'];
-  filteredOptions!: Observable<string[]>;
-
-  ngOnInit() {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || '')),
+  searchCompanyControl = new FormControl('');
+  filteredOptions: Observable<Item[]>;
+  constructor(private store: Store) {
+    this.filteredOptions = this.store.select(
+      CompaniesSelectors.selectcompanies
     );
   }
-
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
+  ngOnInit() {
+    this.searchCompanyControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(async (val) => {
+        if (val) {
+          return this.store.dispatch(
+            CompaniesActions.searchCompanies({ companyName: val })
+          );
+        }
+      })
+    );
   }
 }
